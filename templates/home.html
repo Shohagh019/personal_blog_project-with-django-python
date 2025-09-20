@@ -28,14 +28,7 @@
             <button type="submit" class="btn btn-primary btn-sm w-100 mt-3">Filter</button>
           </form>
         </div>
-      </div>
-    </div>
-
-    <!-- Posts Display Section -->
-    <div class="col-lg-9">
-      <div class="row g-4">
-        <!-- Display the number of posts found -->
-        <div class="col-12 mb-4">
+                      <div class="col-12 mb-4 text-center">
           <p class="text-muted">
             {% if request.GET.category %}
               Showing {{ data|length }} post{% if data|length != 1 %}s{% endif %} in this category.
@@ -44,6 +37,15 @@
             {% endif %}
           </p>
         </div>
+      </div>
+
+    </div>
+    
+
+    <!-- Posts Display Section -->
+    <div class="col-lg-9">
+      <div class="row g-4">
+        <!-- Display the number of posts found -->
 
         {% for post in data %}
         <div class="col-lg-4 col-md-6 col-sm-12">
