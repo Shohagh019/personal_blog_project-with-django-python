@@ -40,12 +40,12 @@ INSTALLED_APPS = [
     'authors',
     'posts',
     'categories',
-    'profiles',
     'crispy_forms',
     'crispy_bootstrap5'
 ]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+LOGIN_URL = '/author/login/'  # Replace with your custom login URL
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

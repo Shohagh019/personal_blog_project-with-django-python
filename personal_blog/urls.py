@@ -23,6 +23,6 @@ urlpatterns = [
     path('', views.home, name = 'home' ),
     path('author/', include('authors.urls')),
     path('post/', include('posts.urls')),
-    path('profile/', include('profiles.urls')),
     path('category/', include('categories.urls')),
+    path('category/<int:category_id>/', views.home, name='category_filter'),
 ]

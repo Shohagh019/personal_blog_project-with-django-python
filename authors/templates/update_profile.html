@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>This is Author Page</h1>
+<h1>This is profile Page</h1>
 {% load crispy_forms_tags %}
 
 {% load crispy_forms_tags %}
@@ -16,5 +16,5 @@
     </button>
   </form>
 </div>
-
+<a href="{% url 'change_pass' %}" class="btn btn-warning mt-3">Change Password</a>
 {% endblock %}

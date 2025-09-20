@@ -1,79 +1,80 @@
-{% extends 'base.html'%} {% block content %}
+{% extends 'base.html' %}
+
+{% block content %}
 <div class="container my-4">
-  <div class="row g-4">
-    <!-- Card Item (loop this) -->
-    <div class="container my-4">
+  <div class="row">
+    <!-- Category Filter Section (Dropdown for filtering by category) -->
+    <div class="col-lg-3">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4">
+          <h5 class="card-title mb-3">Filter by Category</h5>
+          
+          <!-- Category Selection Form (GET method) -->
+          <form method="GET" action="{% url 'home' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="category">Select Category</label>
+              <select name="category" id="category" class="form-select">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}"
+                  {% if category.id == request.GET.category %} selected {% endif %}
+                >
+                  {{ category.name }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm w-100 mt-3">Filter</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts Display Section -->
+    <div class="col-lg-9">
       <div class="row g-4">
+        <!-- Display the number of posts found -->
+        <div class="col-12 mb-4">
+          <p class="text-muted">
+            {% if request.GET.category %}
+              Showing {{ data|length }} post{% if data|length != 1 %}s{% endif %} in this category.
+            {% else %}
+              Showing all posts.
+            {% endif %}
+          </p>
+        </div>
+
         {% for post in data %}
         <div class="col-lg-4 col-md-6 col-sm-12">
           <div class="card h-100 shadow-sm border-0 rounded-4">
-            <!-- Optional: Thumbnail (if you have images for posts) -->
-            <!-- {# <img src="{{ post.image.url }}" class="card-img-top rounded-top" alt="{{ post.title }}"> #} -->
-
             <div class="card-body d-flex flex-column text-center p-3">
-              <!-- Title -->
-              <h5
-                class="card-title fw-semibold mb-1 text-truncate"
-                title="{{ post.title }}"
-              >
+              <h5 class="card-title fw-semibold mb-1 text-truncate" title="{{ post.title }}">
                 {{ post.title }}
               </h5>
-
-              <!-- Author -->
               <p class="text-muted small mb-2">
-                by <span class="fw-medium">{{ post.author.name }}</span>
+                by <span class="fw-medium">{{ post.author.first_name }} {{ post.author.last_name }}</span>
               </p>
-
-              <!-- Content Preview -->
-              <p
-                class="card-text text-muted small mb-2"
-                style="
-                  min-height: 60px;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                "
-              >
+              <p class="card-text text-muted small mb-2" style="min-height: 60px; overflow: hidden; text-overflow: ellipsis;">
                 {{ post.content|truncatewords:20 }}
               </p>
-
-              <!-- Category Pills -->
               <div class="mb-3">
                 {% for cat in post.category.all %}
-                <span
-                  class="badge rounded-pill text-bg-light border px-2 py-1 small"
-                  >{{ cat.name }}</span
-                >
+                <span class="badge rounded-pill text-bg-light border px-2 py-1 small">{{ cat.name }}</span>
                 {% empty %}
-                <span class="badge rounded-pill text-bg-secondary"
-                  >Uncategorized</span
-                >
+                <span class="badge rounded-pill text-bg-secondary">Uncategorized</span>
                 {% endfor %}
-              </div>
-
-              <!-- Button aligned bottom -->
-              <div class="mt-auto d-flex justify-content-center gap-2">
-                <a
-                  href="{% url 'edit_post' post.id %}"
-                  class="btn btn-outline-primary btn-sm rounded-pill flex-fill"
-                >
-                  Edit
-                </a>
-                <a
-                  href="{% url 'delete_post' post.id %}"
-                  class="btn btn-outline-danger btn-sm rounded-pill flex-fill"
-                >
-                  Delete
-                </a>
               </div>
             </div>
           </div>
         </div>
+        {% empty %}
+        <p class="col-12 text-center text-muted">No posts found in this category.</p>
         {% endfor %}
       </div>
     </div>
-
-    <!-- End Card Item -->
   </div>
 </div>
+{% endblock %}
 
-{% endblock%}
+
