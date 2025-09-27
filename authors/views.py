@@ -1,17 +1,25 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm,PasswordChangeForm
 from django.contrib.auth import authenticate, login,update_session_auth_hash, logout
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from posts.models import Post
 from . import forms
+from django.contrib.auth.views import LoginView, LogoutView,PasswordChangeView
+from django.views.generic import UpdateView
+from django.views.generic.edit import CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+
 def register(request):
     if request.method =='POST':
         register_form = forms.RegistrationForm(request.POST)
         if register_form.is_valid():
             register_form.save()
             messages.success(request, 'Account Created Successfully!' )
-            return redirect('register')
+            return redirect('login')
     else:
         register_form = forms.RegistrationForm()    
 
@@ -72,5 +80,68 @@ def change_password(request):
 
 def user_logout(request):
     logout(request)
+    messages.success(request, 'You have been logged out successfully!')
     return redirect('login')
+
+# class based view
+class UserLogin(LoginView):
+    template_name = 'login_form.html'
+    def form_valid(self, form):
+        messages.success(self.request, 'Logged in Successfully!')
+        return super().form_valid(form)
+    def form_invalid(self, form):
+        messages.error(self.request, 'Your Username or Password is Incorrect!')
+        return super().form_invalid(form)
+    def get_success_url(self):
+        return reverse_lazy('profile')
+    
+@method_decorator(login_required, name='dispatch')    
+class UserPasswordChange(PasswordChangeView):
+    form_class = PasswordChangeForm
+    template_name = 'password_change_form.html'
+    success_url = reverse_lazy('profile')  # Replace with your actual URL name
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        update_session_auth_hash(self.request, self.request.user)  # Prevents logout
+        messages.success(self.request, 'Your password was successfully updated!')
+        return response
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below.')
+        return super().form_invalid(form)   
+    
+@method_decorator(login_required, name='dispatch')    
+class UserUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = forms.UserUpdateForm
+    template_name = 'update_profile.html'
+    success_url = reverse_lazy('profile')  # Redirect after successful update
+
+    def get_object(self, queryset=None):
+        # Always return the current logged-in user
+        return self.request.user
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Account Updated Successfully!')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below.')
+        return super().form_invalid(form)     
+       
+@method_decorator(login_required, name='dispatch')       
+class UserRegisterView(CreateView):
+    form_class = forms.RegistrationForm
+    template_name = 'register_form.html'
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Account Created Successfully!')
+        return response
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below.')
+        return super().form_invalid(form)       
            
